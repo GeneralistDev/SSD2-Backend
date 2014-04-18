@@ -12,6 +12,10 @@ public class Application extends Controller {
         return ok(index.render("Your new application is ready."));
     }
 
+    /**
+    * Preflight method that sets required http respons header so that CORS enabled clients
+    * will not fail to request resources from another domain. 
+    **/
     public static Result checkPreFlight(String all) {
     	response().setHeader("Access-Control-Allow-Origin", "*");
 	response().setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE");

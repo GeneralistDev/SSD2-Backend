@@ -5,6 +5,7 @@
 # Home page
 GET     /                          	controllers.Application.index()
 
+# CORS Support route
 OPTIONS	/*all 	controllers.Application.checkPreFlight(all: String)
 
 POST	/vismodel	controllers.Application.newVisModel()
