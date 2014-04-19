@@ -5,6 +5,7 @@
 
 create table visual_model (
   id                        bigint not null,
+  json_model                TEXT,
   constraint pk_visual_model primary key (id))
 ;
 

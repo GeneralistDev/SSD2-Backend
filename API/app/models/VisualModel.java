@@ -10,10 +10,11 @@ public class VisualModel extends Model {
 
 	@Id
 	public Long id;
-	public JsonNode jsonModel;
 
-	public VisualModel() {
-	}
+	@Column(columnDefinition = "TEXT")
+	public String jsonModel;
+
+	public VisualModel() {}
 
 	public static Finder<Long, VisualModel> find = new Model.Finder(
 		Long.class, VisualModel.class
