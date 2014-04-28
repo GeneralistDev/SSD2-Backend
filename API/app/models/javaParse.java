@@ -51,7 +51,7 @@ public class javaParse {
         Logger.info(stringBuilder.toString());
 
         ST source = new ST(stringBuilder.toString());
-        source.inspect();
+        /*source.inspect();*/
 
         source.write(sourceFile, errBuf);
 
