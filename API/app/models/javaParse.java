@@ -8,7 +8,7 @@ import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.*;
 
 public class javaParse {
-    public static void main(String[] args) {
+    public static void main() {
         try {
             run();
         } catch (IOException e) {
@@ -20,11 +20,11 @@ public class javaParse {
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
         manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS,"NodeOutput");
-        JarOutputStream target = new JarOutputStream(new FileOutputStream("output.jar"), manifest);
+        JarOutputStream target = new JarOutputStream(new FileOutputStream("/tmp/NodeOutput.jar"), manifest);
 
         classCompile(createJavaFile());
 
-        add(new File("NodeOutput.class"), target); //Placeholder until java file is generated
+        add(new File("/tmp/NodeOutput.class"), target); //Placeholder until java file is generated
         //write to file "System.lnOut("$node1$ linked to $node2$") or something similar using stringTemplate
 
         target.close();
@@ -32,11 +32,11 @@ public class javaParse {
         
     public static File createJavaFile() throws IOException {
         ST source =
-            new ST("class NodeOutput{\npublic static void main(String[] args){\nSystem.out.println(\"$node1$ is connected to $node2$\");\n }\n}");
-        source.add("node1","");
-        source.add("node2","");
+            new ST("class NodeOutput{\npublic static void main(String[] args){\nSystem.out.println(\"<node1> is connected to <node2>\");\n }\n}");
+        source.add("node1","Person1");
+        source.add("node2","Person2");
 
-        File sourceFile = new File("NodeOutput.java");
+        File sourceFile = new File("/tmp/NodeOutput.java");
         sourceFile.createNewFile();
         ErrorBuffer errBuf = new ErrorBuffer();
         source.write(sourceFile, errBuf);
@@ -85,7 +85,7 @@ public class javaParse {
           return;
         }
 
-        JarEntry entry = new JarEntry(source.getPath().replace("\\", "/"));
+        JarEntry entry = new JarEntry(source.getName());
         entry.setTime(source.lastModified());
         target.putNextEntry(entry);
         in = new BufferedInputStream(new FileInputStream(source));

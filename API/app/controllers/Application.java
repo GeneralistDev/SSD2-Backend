@@ -69,6 +69,8 @@ public class Application extends Controller {
     }
 
     public static Result jar(Long id) {
+        javaParse jparse = new javaParse();
+        javaParse.main();
     	return ok();
     }
 
