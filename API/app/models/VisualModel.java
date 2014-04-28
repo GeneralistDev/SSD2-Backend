@@ -2,8 +2,6 @@ package models;
 
 import javax.persistence.*;
 import play.db.ebean.*;
-import com.avaje.ebean.*;
-import com.fasterxml.jackson.databind.JsonNode;
 
 @Entity
 public class VisualModel extends Model {
