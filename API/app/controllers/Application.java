@@ -1,5 +1,6 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import play.*;
 import play.libs.*;
 import play.libs.Json;
@@ -12,6 +13,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import models.*;
 
 import views.html.*;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Application extends Controller {
 
@@ -68,10 +73,47 @@ public class Application extends Controller {
     	}
     }
 
-    public static Result jar(Long id) {
-        javaParse jparse = new javaParse();
-        javaParse.main();
-    	return ok();
+    public static Result apk(Long id) {
+        VisualModel vModel = VisualModel.find.where().eq("Id", id).findUnique();
+
+        if ( vModel != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                JsonNode root = mapper.readTree(vModel.jsonModel);
+                ArrayNode nodes = (ArrayNode)root.path("nodes");
+                ArrayNode links = (ArrayNode)root.path("links");
+
+                List<Entity> Entities = new ArrayList<Entity>();
+                List<Relationship> relationships = new ArrayList<Relationship>();
+
+                for (int i = 0; i < nodes.size(); i++) {
+                    long entityId = nodes.get(i).get("id").asLong();
+                    String name = nodes.get(i).get("attributes").get("name").asText();
+
+                    Entity e = new Entity(entityId, name);
+                    Entities.add(e);
+                }
+
+                for (int j = 0; j < links.size(); j++) {
+                    long linkId = links.get(j).get("id").asLong();
+                    Entity e1 = Entities.get(links.get(j).get("sourceID").asInt()-1);
+                    Entity e2 = Entities.get(links.get(j).get("targetID").asInt()-1);
+                    String relationshipType = links.get(j).get("attributes").get("name").asText();
+
+                    Relationship r = new Relationship(linkId, e1, e2, relationshipType);
+                    relationships.add(r);
+                }
+
+                return ok(
+                    new File(javaParse.run(relationships))
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+                return badRequest(vModel.jsonModel);
+            }
+        } else {
+            return notFound();
+        }
     }
 
     public static Result dsl(Long id) {
