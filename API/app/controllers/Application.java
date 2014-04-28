@@ -12,7 +12,18 @@ public class Application extends Controller {
         return ok(index.render("Your new application is ready."));
     }
 
+    /**
+    * Preflight method that sets required http respons header so that CORS enabled clients
+    * will not fail to request resources from another domain. 
+    **/
+    public static Result checkPreFlight(String all) {
+    	response().setHeader("Access-Control-Allow-Origin", "*");
+	response().setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE");
+	response().setHeader("Access-Control-Allow-Headers", "accept, origin, Content-type, x-json, x-prototype-version, x-requested-with");
+	return ok();
+}
     public static Result newVisModel() {
+    	response().setHeader("Access-Control-Allow-Origin", "*");
     	VisualModel vModel = new VisualModel();
     	vModel.save();
  	return created(
@@ -21,17 +32,19 @@ public class Application extends Controller {
     }
 
     public static Result updateVisModel(Long id) {
-
+    	response().setHeader("Access-Control-Allow-Origin", "*");
     	return ok(
     		VisualModel.find.where().eq("Id", id).findUnique().id.toString()
     	);
     }
 
     public static Result jar(Long id) {
+    	response().setHeader("Access-Control-Allow-Origin", "*");
     	return ok();
     }
 
     public static Result dsl(Long id) {
+    	response().setHeader("Access-Control-Allow-Origin", "*");
     	return ok();
     }
 }
