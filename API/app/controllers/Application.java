@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.scott.rapt.compiler.Rapt;
 import play.*;
 import play.libs.Json;
 import play.mvc.*;
@@ -12,8 +13,8 @@ import models.*;
 import views.html.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Application extends Controller {
 
@@ -84,38 +85,25 @@ public class Application extends Controller {
 
     public static Result apk(Long id) {
     	response().setHeader("Access-Control-Allow-Origin", "*");
+
+        Rapt rapt = new Rapt();
+        Path pathToImages = Paths.get("/var/raptide");
+
         VisualModel vModel = VisualModel.find.where().eq("Id", id).findUnique();
 
         if ( vModel != null) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 JsonNode root = mapper.readTree(vModel.jsonModel);
-                ArrayNode nodes = (ArrayNode)root.path("nodes");
-                ArrayNode links = (ArrayNode)root.path("links");
-
-                List<Person> Entities = new ArrayList<Person>();
-                List<Relationship> relationships = new ArrayList<Relationship>();
-
-                for (int i = 0; i < nodes.size(); i++) {
-                    long entityId = nodes.get(i).get("id").asLong();
-                    String name = nodes.get(i).get("attributes").get("name").asText();
-
-                    Person e = new Person(entityId, name);
-                    Entities.add(e);
+                String AMLString = ModelTransformer.visualToAML(root);
+                if (AMLString == null) {
+                    return badRequest(root);
                 }
 
-                for (int j = 0; j < links.size(); j++) {
-                    long linkId = links.get(j).get("id").asLong();
-                    Person e1 = Entities.get(links.get(j).get("sourceID").asInt()-1);
-                    Person e2 = Entities.get(links.get(j).get("targetID").asInt()-1);
-                    String relationshipType = links.get(j).get("attributes").get("name").asText();
-
-                    Relationship r = new Relationship(linkId, e1, e2, relationshipType);
-                    relationships.add(r);
-                }
+                rapt.generate("Test", AMLString, false, "/var/raptide", pathToImages);
 
                 return ok(
-                        new File(javaParse.run(relationships))
+                        new File("/var/raptide/Test")
                 );
             } catch (Exception e) {
                 e.printStackTrace();
