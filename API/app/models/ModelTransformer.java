@@ -35,7 +35,7 @@ public class ModelTransformer {
             JsonNode thisNode = nodes.get(i);
             String nodeType = thisNode.get("nodeType").asText();
             if (nodeType.equals("screenNode")) {
-                Long id = thisNode.get("nodeID").asLong();
+                Long id = thisNode.get("id").asLong();
                 JsonNode attributes = thisNode.get("attributes");
 
                 if (id == null) {
