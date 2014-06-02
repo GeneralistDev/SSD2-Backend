@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import models.AMLComponents.App;
 import models.AMLComponents.ModelTransformationException;
+import models.AMLComponents.Navigation;
 import models.AMLComponents.Screen;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class ModelTransformer {
 
         App app = new App();
         ArrayList<Screen> screens = new ArrayList<>();
+        Navigation navigation = new Navigation();
 
         /* Check if there are any nodes */
         if (nodes.isMissingNode()) {
@@ -48,21 +50,48 @@ public class ModelTransformer {
 
                     Boolean isStartScreen = startScreenBoolean.asBoolean();
 
+                    JsonNode isTabBoolean = attributes.get("isTab");
+                    if (isTabBoolean == null) {
+                        throw new ModelTransformationException("The isTab boolean was null in the provided json");
+                    }
+
+                    Boolean isTab = isTabBoolean.asBoolean();
+
                     if (isStartScreen != null) {
                         Screen screen = new Screen(id);
                         if (isStartScreen) {
                             app.startScreenId = screen.getScreenId();
+                        }
+
+                        if (isTab != null) {
+                            navigation.addTab(screen.getScreenId(), screen.getScreenId());
                         }
                         screens.add(screen);
                     }
                 } else {
                     throw new ModelTransformationException("Node is missing attributes");
                 }
+            } else if (nodeType.equals("appProperties")) {
+                JsonNode attributes = thisNode.get("attributes");
+                if (attributes != null) {
+                    JsonNode navType = attributes.get("navigationType");
+                    switch (navType.asText()) {
+                        case "Drawer":
+                            navigation.setNavType(Navigation.NavType.DRAWER);
+                            break;
+                        case "Tabbar":
+                            navigation.setNavType(Navigation.NavType.TABBAR);
+                            break;
+                    }
+                } else {
+                    throw new ModelTransformationException("App properties has no attributes");
+                }
             }
         }
 
         /* Construct the final AML string and return it */
         StringBuilder AML = new StringBuilder();
+        app.addOptional(navigation.toAMLString());
         String appString = app.toAMLString();
         if (appString == null) {
             throw new ModelTransformationException("App properties had no id");

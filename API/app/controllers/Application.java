@@ -3,6 +3,7 @@ package controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.AMLComponents.ModelTransformationException;
+import org.apache.commons.io.FileUtils;
 import org.scott.rapt.compiler.Rapt;
 import play.*;
 import play.libs.Json;
@@ -112,6 +113,7 @@ public class Application extends Controller {
                 ArrayList<File> filesInDirectory = new ArrayList<>();
                 ZipDirectory.getAllFiles(directoryToZip, filesInDirectory);
                 ZipDirectory.writeZipFile(directoryToZip, filesInDirectory, outputDirectory);
+                FileUtils.deleteDirectory(directoryToZip);
 
                 return ok(
                         new File("tmp/Test.zip")
