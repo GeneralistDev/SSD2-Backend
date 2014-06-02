@@ -1,6 +1,8 @@
 package controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import models.AMLComponents.ModelTransformationException;
 import org.scott.rapt.compiler.Rapt;
 import play.*;
 import play.libs.Json;
@@ -9,12 +11,13 @@ import play.mvc.Http.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.*;
 import models.*;
-
 import views.html.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class Application extends Controller {
 
@@ -97,17 +100,29 @@ public class Application extends Controller {
                 JsonNode root = mapper.readTree(vModel.jsonModel);
                 String AMLString = ModelTransformer.visualToAML(root);
                 if (AMLString == null) {
-                    return badRequest(root);
+                    return badRequest(vModel.jsonModel);
                 }
 
-                rapt.generate("Test", AMLString, false, "/var/raptide", pathToImages);
+                /*Path workingDir = Paths.get(System.getProperty("user.dir"));
+                workingDir*/
+                rapt.generate("Test", AMLString, false, "tmp/raptide/", null);
+
+                File directoryToZip = new File("tmp/raptide/Test");
+                File outputDirectory = new File ("tmp/");
+                ArrayList<File> filesInDirectory = new ArrayList<>();
+                ZipDirectory.getAllFiles(directoryToZip, filesInDirectory);
+                ZipDirectory.writeZipFile(directoryToZip, filesInDirectory, outputDirectory);
 
                 return ok(
-                        new File("/var/raptide/Test")
+                        new File("tmp/Test.zip")
                 );
-            } catch (Exception e) {
+            } catch (ModelTransformationException e) {
+                return badRequest(e.getMessage());
+            } catch (JsonProcessingException e) {
+                return badRequest("Error reading json (possibly malformed)");
+            } catch (IOException e) {
                 e.printStackTrace();
-                return badRequest(vModel.jsonModel);
+                return badRequest("An exception occurred when reading from database");
             }
         } else {
             return notFound();
@@ -116,6 +131,27 @@ public class Application extends Controller {
 
     public static Result dsl(Long id) {
     	response().setHeader("Access-Control-Allow-Origin", "*");
-    	return ok();
+        VisualModel vModel = VisualModel.find.where().eq("Id", id).findUnique();
+
+        if ( vModel != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                JsonNode root = mapper.readTree(vModel.jsonModel);
+                String AMLString = ModelTransformer.visualToAML(root);
+                if (AMLString == null) {
+                    return badRequest(vModel.jsonModel);
+                }
+
+                return ok(
+                    AMLString
+                );
+            } catch (ModelTransformationException e) {
+                return badRequest(e.getMessage());
+            } catch (Exception e) {
+                return badRequest(vModel.jsonModel);
+            }
+        } else {
+            return notFound();
+        }
     }
 }

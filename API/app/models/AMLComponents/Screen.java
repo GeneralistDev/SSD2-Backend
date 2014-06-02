@@ -10,8 +10,8 @@ public class Screen {
     private String screenId;
     private ST screenTemplate = new ST(
         "screen <id> \"<screenName>\" {\n" +
-        "   view MainLayout {\n" +
-        "       label labelId \"Screen <screenName>\"\n" +
+        "   view <layoutID> {\n" +
+        "       label <label> \"Screen <screenName>\"\n" +
         "   }\n" +
         "}\n"
     );
@@ -28,6 +28,8 @@ public class Screen {
     public String toAMLString() {
         screenTemplate.add("id", screenId);
         screenTemplate.add("screenName", screenId);
+        screenTemplate.add("label", screenId + "label");
+        screenTemplate.add("layoutID", screenId + "layout");
         return screenTemplate.render();
     }
 }

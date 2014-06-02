@@ -3,6 +3,7 @@ package models;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import models.AMLComponents.App;
+import models.AMLComponents.ModelTransformationException;
 import models.AMLComponents.Screen;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class ModelTransformer {
 
     private ModelTransformer() {}
 
-    public static String visualToAML(JsonNode rootNode) {
+    public static String visualToAML(JsonNode rootNode) throws ModelTransformationException{
         ArrayNode nodes = (ArrayNode)rootNode.path("nodes");
         /*ArrayNode links = (ArrayNode)rootNode.path("links");*/
 
@@ -24,7 +25,7 @@ public class ModelTransformer {
 
         /* Check if there are any nodes */
         if (nodes.isMissingNode()) {
-            return null;
+            throw new ModelTransformationException("Visual model is empty");
         }
 
         /* Iterate through all nodes and create screens */
@@ -36,13 +37,13 @@ public class ModelTransformer {
                 JsonNode attributes = thisNode.get("attributes");
 
                 if (id == null) {
-                    return null;
+                    throw new ModelTransformationException("Visual node is missing an ID");
                 }
 
                 if (attributes != null) {
                     JsonNode startScreenBoolean = attributes.get("isLanding");
                     if (startScreenBoolean == null) {
-                        return null;
+                        throw new ModelTransformationException("Start screen boolean was null in json");
                     }
 
                     Boolean isStartScreen = startScreenBoolean.asBoolean();
@@ -55,7 +56,7 @@ public class ModelTransformer {
                         screens.add(screen);
                     }
                 } else {
-                    return null;
+                    throw new ModelTransformationException("Node is missing attributes");
                 }
             }
         }
@@ -64,7 +65,7 @@ public class ModelTransformer {
         StringBuilder AML = new StringBuilder();
         String appString = app.toAMLString();
         if (appString == null) {
-            return null;
+            throw new ModelTransformationException("App properties had no id");
         } else {
             AML.append(appString);
             for (Screen s : screens) {
