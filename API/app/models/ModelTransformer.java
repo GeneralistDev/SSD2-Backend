@@ -71,7 +71,7 @@ public class ModelTransformer {
                 } else {
                     throw new ModelTransformationException("Node is missing attributes");
                 }
-            } else if (nodeType.equals("appProperties")) {
+            } else if (nodeType.equals("appPropertiesNode")) {
                 JsonNode attributes = thisNode.get("attributes");
                 if (attributes != null) {
                     JsonNode navType = attributes.get("navigationType");
