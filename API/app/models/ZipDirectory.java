@@ -31,7 +31,8 @@ public class ZipDirectory {
 	public static void writeZipFile(File directoryToZip, List<File> fileList, File outputDirectory) {
 
 		try {
-			FileOutputStream fos = new FileOutputStream(outputDirectory.getName() + "/" + directoryToZip.getName() + ".zip");
+            System.out.println(outputDirectory.getPath());
+			FileOutputStream fos = new FileOutputStream(outputDirectory.getPath() + ".zip");
 			ZipOutputStream zos = new ZipOutputStream(fos);
 
 			for (File file : fileList) {

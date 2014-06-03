@@ -17,7 +17,7 @@ public class ModelTransformer {
 
     private ModelTransformer() {}
 
-    public static String visualToAML(JsonNode rootNode) throws ModelTransformationException{
+    public static String visualToAML(JsonNode rootNode, String appName) throws ModelTransformationException{
         ArrayNode nodes = (ArrayNode)rootNode.path("nodes");
         /*ArrayNode links = (ArrayNode)rootNode.path("links");*/
 
@@ -63,7 +63,7 @@ public class ModelTransformer {
                             app.startScreenId = screen.getScreenId();
                         }
 
-                        if (isTab != null) {
+                        if (isTab) {
                             navigation.addTab(screen.getScreenId(), screen.getScreenId());
                         }
                         screens.add(screen);
@@ -75,6 +75,12 @@ public class ModelTransformer {
                 JsonNode attributes = thisNode.get("attributes");
                 if (attributes != null) {
                     JsonNode navType = attributes.get("navigationType");
+                    JsonNode applicationName = attributes.get("appName");
+                    if (applicationName == null) {
+                        throw new ModelTransformationException("No application name was supplied");
+                    }
+                    appName = applicationName.asText();
+
                     switch (navType.asText()) {
                         case "Drawer":
                             navigation.setNavType(Navigation.NavType.DRAWER);

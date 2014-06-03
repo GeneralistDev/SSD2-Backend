@@ -1,5 +1,6 @@
 package controllers;
 
+import akka.event.Logging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.AMLComponents.ModelTransformationException;
@@ -18,7 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Application extends Controller {
 
@@ -91,7 +95,7 @@ public class Application extends Controller {
     	response().setHeader("Access-Control-Allow-Origin", "*");
 
         Rapt rapt = new Rapt();
-        Path pathToImages = Paths.get("/var/raptide");
+        /*Path pathToImages = Paths.get("/var/raptide");*/
 
         VisualModel vModel = VisualModel.find.where().eq("Id", id).findUnique();
 
@@ -99,24 +103,33 @@ public class Application extends Controller {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 JsonNode root = mapper.readTree(vModel.jsonModel);
-                String AMLString = ModelTransformer.visualToAML(root);
+                String appName = new String();
+                String AMLString = ModelTransformer.visualToAML(root, appName);
+                /* TEMPORARY */
+                appName = "APPNAME";
+                /* TEMPORARY */
                 if (AMLString == null) {
                     return badRequest(vModel.jsonModel);
                 }
 
                 /*Path workingDir = Paths.get(System.getProperty("user.dir"));
                 workingDir*/
-                rapt.generate("Test", AMLString, false, "tmp/raptide/", null);
-
-                File directoryToZip = new File("tmp/raptide/Test");
-                File outputDirectory = new File ("tmp/");
+                Calendar calendar = Calendar.getInstance();
+                Date now = calendar.getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
+                String appNameDated = appName + dateFormat.format(now);
+                Logger.info("appName == " + appName);
+                rapt.generate(appName, AMLString, false, "tmp/raptide/", null);
+                System.out.println("tmp/raptide/" + appName);
+                File directoryToZip = new File("tmp/raptide/" + appName);
+                File outputDirectory = new File ("tmp/" + appNameDated);
                 ArrayList<File> filesInDirectory = new ArrayList<>();
                 ZipDirectory.getAllFiles(directoryToZip, filesInDirectory);
                 ZipDirectory.writeZipFile(directoryToZip, filesInDirectory, outputDirectory);
-                FileUtils.deleteDirectory(directoryToZip);
+                /*FileUtils.deleteDirectory(directoryToZip);*/
 
                 return ok(
-                        new File("tmp/Test.zip")
+                        new File("tmp/" + appNameDated +".zip")
                 );
             } catch (ModelTransformationException e) {
                 return badRequest(e.getMessage());
@@ -139,7 +152,7 @@ public class Application extends Controller {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 JsonNode root = mapper.readTree(vModel.jsonModel);
-                String AMLString = ModelTransformer.visualToAML(root);
+                String AMLString = ModelTransformer.visualToAML(root, null);
                 if (AMLString == null) {
                     return badRequest(vModel.jsonModel);
                 }
