@@ -14,7 +14,7 @@ PUT	/vismodel/:id	controllers.Application.updateVisModel(id: Long)
 
 GET	/vismodel/:id 	controllers.Application.getVisModel(id: Long)
 
-GET	/jar/:id		controllers.Application.jar(id: Long)
+GET	/apk/:id		controllers.Application.apk(id: Long)
 
 GET	/dsl/:id 		controllers.Application.dsl(id: Long)
 
