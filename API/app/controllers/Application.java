@@ -70,6 +70,7 @@ public class Application extends Controller {
     	if (json == null) {
     		return status(406);
     	}
+        System.out.println(json.toString());
     	vModel.jsonModel = json.toString();
     	vModel.update(id);
     	Logger.info(body.asText());
