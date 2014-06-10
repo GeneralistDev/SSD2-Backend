@@ -7,15 +7,15 @@ import org.stringtemplate.v4.ST;
  */
 public class API {
     ST apiTemplateStart = new ST(
-            "\tapi appAPI <APIUrl> {\n"
+            "api appAPI \"<APIUrl>\" {\n"
     );
 
     ST resourceTemplate = new ST(
-            "\t\tresource <resourceName> GET \"<endPointUrl>\"\n"
+            "\tresource <resourceName> GET \"<endPointUrl>\"\n"
     );
 
     ST apiTemplateEnd = new ST(
-            "\t}\n"
+            "}\n"
     );
 
     public API() {

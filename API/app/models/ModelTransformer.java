@@ -130,14 +130,15 @@ public class ModelTransformer {
         StringBuilder AML = new StringBuilder();
         app.addOptional(navigation.toAMLString());
         String appString = app.toAMLString();
-        AML.append(api.toAMLString());
         if (appString == null) {
             throw new ModelTransformationException("App properties had no id");
         } else {
             AML.append(appString);
+            AML.append(api.toAMLString());
             for (Screen s : screens) {
                 AML.append(s.toAMLString());
             }
+            System.out.println(AML.toString());
             return AML.toString();
         }
     }

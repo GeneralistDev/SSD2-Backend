@@ -2,7 +2,7 @@ package models.AMLComponents;
 
 import org.stringtemplate.v4.ST;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by danielparker on 26/05/2014.
@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Screen {
     private long id;
     private String screenId;
-    private HashMap<String, String> labels = new HashMap<>();
+    private LinkedHashMap<String, String> labels = new LinkedHashMap<>();
     private Boolean needsOnLoad = false;
 
     private ST screenTemplateStart = new ST(
@@ -34,6 +34,10 @@ public class Screen {
         "       label <labelID> \"<labelValue>\"\n"
     );
 
+    private ST APILabelTemplate = new ST(
+        "       label <labelID>\n"
+    );
+
     private ST screenTemplateEnd = new ST(
         "   }\n" +
         "}\n"
@@ -50,19 +54,24 @@ public class Screen {
             if (!needsOnLoad) {
                 domain = domain + parts[0];
                 api.addAPIUrl(domain);
-                api.addResource(screenId, screenId);
-                System.out.println(api.toAMLString());
-                callTemplate.add("apiResource", "appAPI." + "/" + screenId);
+                api.addResource(screenId + "Res", "/" + screenId);
+                callTemplate.add("apiResource", "appAPI." + screenId + "Res");
                 needsOnLoad = true;
             }
-            String[] jsonNav = parts[1].split(".");
+            String[] jsonNav = parts[1].split("\\.");
             StringBuilder labelValue = new StringBuilder();
             for (int i = 0; i < jsonNav.length; i++) {
-                if (i != 0) {
+                if ((jsonNav.length - 1) == i) {
+                    if (i == 0) {
+                        labelValue.append(jsonNav[0] + "<stringT>");
+                    } else {
+                        labelValue.append("." + jsonNav[i] + "<stringT>");
+                    }
+                } else if (i != 0) {
                     labelValue.append(".");
                     labelValue.append(jsonNav[i] + "<objectT>");
                 } else {
-                    labelValue.append(jsonNav[i] + "<stringT>");
+                    labelValue.append(jsonNav[i] + "<objectT>");
                 }
             }
             labels.put(labelValue.toString(), null);
@@ -95,13 +104,14 @@ public class Screen {
             if (labels.get(key) != null) {
                 labelTemplate.add("labelID", labels.get(key));
                 labelTemplate.add("labelValue", labels.get(key));
+                stringBuilder.append(labelTemplate.render());
+                labelTemplate.remove("labelID");
+                labelTemplate.remove("labelValue");
             } else {
-                labelTemplate.add("labelID", key);
-                labelTemplate.add("labelValue", "");
+                APILabelTemplate.add("labelID", key);
+                stringBuilder.append(APILabelTemplate.render());
+                APILabelTemplate.remove("labelID");
             }
-            stringBuilder.append(labelTemplate.render());
-            labelTemplate.remove("labelID");
-            labelTemplate.remove("labelValue");
         }
         stringBuilder.append(screenTemplateEnd.render());
         return stringBuilder.toString();
