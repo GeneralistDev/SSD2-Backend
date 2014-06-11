@@ -13,6 +13,9 @@ public class ModelTransformer {
     private ModelTransformer() {}
 
     public static String visualToAML(JsonNode rootNode, StringBuilder appName) throws ModelTransformationException{
+        if (appName == null) {
+            appName = new StringBuilder();
+        }
         ArrayNode nodes = (ArrayNode)rootNode.path("nodes");
         /*ArrayNode links = (ArrayNode)rootNode.path("links");*/
 

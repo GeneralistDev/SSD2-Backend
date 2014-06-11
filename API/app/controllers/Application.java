@@ -150,8 +150,10 @@ public class Application extends Controller {
         if ( vModel != null) {
             ObjectMapper mapper = new ObjectMapper();
             try {
+                Logger.info(vModel.jsonModel);
                 JsonNode root = mapper.readTree(vModel.jsonModel);
                 String AMLString = ModelTransformer.visualToAML(root, null);
+
                 if (AMLString == null) {
                     return badRequest(vModel.jsonModel);
                 }
@@ -161,8 +163,12 @@ public class Application extends Controller {
                 );
             } catch (ModelTransformationException e) {
                 return badRequest(e.getMessage());
-            } catch (Exception e) {
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
                 return badRequest(vModel.jsonModel);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return status(INTERNAL_SERVER_ERROR);
             }
         } else {
             return notFound();
