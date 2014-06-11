@@ -36,8 +36,8 @@ public class Application extends Controller {
     **/
     public static Result checkPreFlight(String all) {
     	response().setHeader("Access-Control-Allow-Origin", "*");
-	response().setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE");
-	response().setHeader("Access-Control-Allow-Headers", "accept, origin, Content-type, x-json, x-prototype-version, x-requested-with");
+	    response().setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE");
+	    response().setHeader("Access-Control-Allow-Headers", "accept, origin, Content-type, x-json, x-prototype-version, x-requested-with");
 	return ok();
 }
     public static Result newVisModel() {
@@ -51,11 +51,11 @@ public class Application extends Controller {
     		ObjectNode empty = Json.newObject();
     		vModel.jsonModel = empty.toString();
     	}
-    	vModel.save();				// Save object to database
+    	vModel.save();				            // Save object to database
 
     	ObjectNode result = Json.newObject();	// JSON to return
     	result.put("id", vModel.id.toString());	// add id to result json
- 	return created(result);			// return 201 created with id in json body
+ 	    return created(result);			        // return 201 created with id in json body
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -104,11 +104,9 @@ public class Application extends Controller {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 JsonNode root = mapper.readTree(vModel.jsonModel);
-                String appName = new String();
+                StringBuilder appName = new StringBuilder();
                 String AMLString = ModelTransformer.visualToAML(root, appName);
-                /* TEMPORARY */
-                appName = "APPNAME";
-                /* TEMPORARY */
+
                 if (AMLString == null) {
                     return badRequest(vModel.jsonModel);
                 }
@@ -120,14 +118,14 @@ public class Application extends Controller {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
                 String appNameDated = appName + dateFormat.format(now);
                 Logger.info("appName == " + appName);
-                rapt.generate(appName, AMLString, false, "tmp/raptide/", null);
+                rapt.generate(appName.toString(), AMLString, false, "tmp/raptide/", null);
                 System.out.println("tmp/raptide/" + appName);
                 File directoryToZip = new File("tmp/raptide/" + appName);
                 File outputDirectory = new File ("tmp/" + appNameDated);
                 ArrayList<File> filesInDirectory = new ArrayList<>();
                 ZipDirectory.getAllFiles(directoryToZip, filesInDirectory);
                 ZipDirectory.writeZipFile(directoryToZip, filesInDirectory, outputDirectory);
-                /*FileUtils.deleteDirectory(directoryToZip);*/
+                FileUtils.deleteDirectory(directoryToZip);
 
                 return ok(
                         new File("tmp/" + appNameDated +".zip")

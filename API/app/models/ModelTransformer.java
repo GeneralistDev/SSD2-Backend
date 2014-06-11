@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class ModelTransformer {
     private ModelTransformer() {}
 
-    public static String visualToAML(JsonNode rootNode, String appName) throws ModelTransformationException{
+    public static String visualToAML(JsonNode rootNode, StringBuilder appName) throws ModelTransformationException{
         ArrayNode nodes = (ArrayNode)rootNode.path("nodes");
         /*ArrayNode links = (ArrayNode)rootNode.path("links");*/
 
@@ -110,7 +110,7 @@ public class ModelTransformer {
                     if (applicationName == null) {
                         throw new ModelTransformationException("No application name was supplied");
                     }
-                    appName = applicationName.asText();
+                    appName.append(applicationName.asText());
 
                     switch (navType.asText()) {
                         case "Drawer":

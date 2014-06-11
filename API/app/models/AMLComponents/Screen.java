@@ -100,9 +100,11 @@ public class Screen {
             stringBuilder.append( callTemplate.render());
             stringBuilder.append(onLoadEnd.render());
         }
+        int labelCount = 0;
         for (String key: labels.keySet()) {
             if (labels.get(key) != null) {
-                labelTemplate.add("labelID", labels.get(key));
+                labelTemplate.add("labelID", screenId + "label" + labelCount);
+                labelCount++;
                 labelTemplate.add("labelValue", labels.get(key));
                 stringBuilder.append(labelTemplate.render());
                 labelTemplate.remove("labelID");
