@@ -2,7 +2,26 @@ README
 ===
 This is the backend to the RAPTIDE tool. If you are looking for the frontend repository then [click here](http://github.com/rlgod/SSD2-Frontend).
 ## Demo
-For a short demo of the working product see our [YouTube Demo](https://www.youtube.com/watch?v=FUUVBXXRfRU) 
+For a short demo of the working product see our [YouTube Demo](https://www.youtube.com/watch?v=FUUVBXXRfRU)
+## Setup and Dependencies
+Author: [Daniel Parker](mailto:dparker.tech@gmail.com)
+### Dependencies
+1. Play framework: Install the java version of the play framework on your system from the [play website](http://www.playframework.com). Ensure that the ```play``` command is in your system path.
+2. git
+
+3. RAPT Toolchain: RAPT is a private project. Contact me if you're interested in gaining access.
+
+###Setup and Configuration
+1. Clone this repository to any directory
+```
+git clone https://github.com/rlgod/SSD2-Backend.git
+```
+2. Enter the directory and run the play framework
+```
+cd SSD2-Backend
+play run
+```
+
 ## Code Review Process
 This standard for code review is intended to improve both source code quality and also the cross-developer awareness. All development team members must follow this code review process and ensure that the process is followed at all times.
 
