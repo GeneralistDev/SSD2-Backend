@@ -1,5 +1,6 @@
 README
 ===
+This is the backend to the RAPTIDE tool. If you are looking for the frontend repository then [click here](http://github.com/rlgod/SSD2-Frontend).
 ## Code Review Process
 This standard for code review is intended to improve both source code quality and also the cross-developer awareness. All development team members must follow this code review process and ensure that the process is followed at all times.
 
