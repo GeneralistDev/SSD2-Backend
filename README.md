@@ -3,6 +3,9 @@ README
 This is the backend to the RAPTIDE tool. If you are looking for the frontend repository then [click here](http://github.com/rlgod/SSD2-Frontend).
 ## Demo
 For a short demo of the working product see our [YouTube Demo](https://www.youtube.com/watch?v=FUUVBXXRfRU)
+## Tutorial
+* The backend only requires execution as per the 'Setup and Configuration' section of this document. See the frontend repository for the web app usage tutorial.
+
 ## Architecture
 This [architecture document](https://docs.google.com/document/d/1ymm5JxymRaUHveXnVgvbNbWf8D08Hx2GNmioxPNem50/edit#heading=h.br3fwomvrzib) outlines the structure of both parts of the RAPTIDE program.
 ## Setup and Dependencies
